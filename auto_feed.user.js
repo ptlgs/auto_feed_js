@@ -969,6 +969,7 @@ const default_site_info = {
     'ANT': {'url': 'https://anthelion.me/', 'enable': 1},
     'avz': {'url': 'https://avistaz.to/', 'enable': 1},
     'Audiences': {'url': 'https://audiences.me/', 'enable': 1},
+    'PTLGS': {'url': 'https://ptlgs.org/', 'enable': 1},
     'BHD' : {'url': 'https://beyond-hd.me/', 'enable': 1},
     'Aither': {'url': 'https://aither.cc/', 'enable': 1},
     'BLU': {'url': 'https://blutopia.cc/', 'enable': 1},
@@ -1226,10 +1227,10 @@ const default_search_list = [
 var used_search_list = GM_getValue('used_search_list') === undefined ? default_search_list : JSON.parse(GM_getValue('used_search_list')).split(',');
 
 //常用站点列表，这里只是举例说明，可以替换成自己想要的站点名称即可
-const default_common_sites = ['HDPost', 'TTG', 'CMCT', 'HUDBT', 'PTer'];
+const default_common_sites = ['PTLGS', 'HDPost', 'TTG', 'CMCT', 'HUDBT', 'PTer'];
 var used_common_sites = GM_getValue('used_common_sites') === undefined ? default_common_sites: JSON.parse(GM_getValue('used_common_sites')).split(',');
 //签到站点列表
-const default_signin_sites = ['HDPost', 'TTG', 'CMCT', 'HUDBT', 'PTer'];
+const default_signin_sites = ['PTLGS', 'HDPost', 'TTG', 'CMCT', 'HUDBT', 'PTer'];
 var used_signin_sites = GM_getValue('used_signin_sites') === undefined ? default_common_sites: JSON.parse(GM_getValue('used_signin_sites')).split(',');
 
 //欧美国家列表，可以酌情添加
@@ -1818,6 +1819,7 @@ const reg_team_name = {
     'HDHome': /(-hdh|.*@HDHome)/i,
     'PThome': /(-pthome|-pth|.*@pth)/i,
     'Audiences': /(-Audies|.*@Audies|-ADE|-ADWeb|.*@ADWeb)/i,
+    'PTLGS': /(-PTLGS|.*@PTLGS)/i,
     'PuTao': /-putao/i,
     'NanYang': /-nytv/i,
     'TLFbits': /-tlf/i,
@@ -4022,9 +4024,9 @@ function check_team(raw_info, s_name, forward_site) {
         $(`select[name="team_sel"]>option:eq(11)`).attr('selected', true);
         return;
     }
-    $(`select[name="${s_name}"]>option`).map(function(index,e){
+    $(`select[name^="${s_name}"]>option`).map(function(index,e){
         var name = raw_info.name.split(/(19}20)\d{2}/).pop();
-        if (name.match(e.innerText)) {
+        if (name.toLowerCase().match(e.innerText.toLowerCase())) {
             if ((name.match(/LCHD/) && e.innerText == 'CHD') || (name.match(/PandaMoon/) && e.innerText == 'Panda') || e.innerText == 'DIY' || e.innerText == 'REMUX') {
                 console.log('小组名貌似会产生误判');
                 return;
@@ -4033,7 +4035,7 @@ function check_team(raw_info, s_name, forward_site) {
             } else if (name.match(/HDClub/i) && e.innerText.match(/HDC/i)) {
                 return;
             } else {
-                $(`select[name="${s_name}"]>option:eq(${index})`).attr('selected', true);
+                $(`select[name^="${s_name}"]>option:eq(${index})`).attr('selected', true);
             }
         }
     });
@@ -5928,7 +5930,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
 
         $('#begin_sign').click((e)=>{
             e.preventDefault();
-            var attendance_sites = ['PThome', 'HDHome', 'HDDolby', 'Audiences', 'SoulVoice','OKPT', 'UltraHD', 'CarPt', 'DaJiao', 'ECUST', 'iloli', 'PTChina',
+            var attendance_sites = ['PThome', 'HDHome', 'HDDolby', 'Audiences', 'PTLGS', 'SoulVoice','OKPT', 'UltraHD', 'CarPt', 'DaJiao', 'ECUST', 'iloli', 'PTChina',
             'HDVideo', 'HDAtmos', 'HDZone', 'HDTime', 'FreeFarm', 'HDfans', 'PTT', 'HDMaYi', 'HDPt', 'ZMPT', 'OKPT', '悟空', 'CrabPt', 'QingWa', 'ICC', 'ToSky',
             'CyanBug', '2xFree', '杏林', '海棠', 'Panda', 'KuFei', 'RouSi', 'PTCafe', 'GTK', 'HHClub', '象岛', '麒麟','AGSV', 'Oshen', 'PTFans'];
 
@@ -6376,10 +6378,10 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
 
         //**************************************************** 4 ***************************************************************************
         $('#setting').append(`<b>快速搜索站点设置(每个一行,可自行添加)
-            <a href="https://gitee.com/tomorrow505/auto-feed-helper/raw/master/temple_search_urls" target=_blank>
+            <a href="https://raw.githubusercontent.com/ptlgs/auto_feed_js/master/temple_search_urls" target=_blank>
             <font color="red">范例</font></a></b></br>`);
 
-        getDoc('https://gitee.com/tomorrow505/auto-feed-helper/raw/master/temple_search_urls', null, function(doc){
+        getDoc('https://raw.githubusercontent.com/ptlgs/auto_feed_js/master/temple_search_urls', null, function(doc){
             $(`<font>从范例页面获取：</font><input id="url_input" type="text" list="options_jump_href" style="border-radius:2px;">
                 <datalist name="options_jump_href" id="options_jump_href" style="width:100px; margin-bottom:3px; margin-right:5px"><option value="---">---</option></datalist><a type="button" id="append_url" href="#" style="color:blue">↓ 新增</a><br>`).insertBefore($('textarea[name="set_jump_href"]'));
             $(`<div style="display:none; margin-bottom:5px"><span id="show_selected"></span><br></div>`).insertBefore($('textarea[name="set_jump_href"]'));
@@ -12125,7 +12127,11 @@ function auto_feed() {
                 } else {
                     img_url_wsrv = img_url;
                 }
-                para.innerHTML = '<div style="display:inline-block; margin-bottom: 2px;"><img src="' + img_url_wsrv +
+                var divStyle='display:inline-block; margin-bottom: 2px;';
+                if(key.toLowerCase()==='ptlgs'){
+                    divStyle+= 'background: linear-gradient(to right, #6666ff, #0099ff, #00ff00, #ff3399, #6666ff);color:transparent;background-size: 400% 100%;font-weight:bold;background-clip: text;animation: ptlgs_rainbow_animation 6s ease-in-out infinite;'
+                }
+                para.innerHTML = '<div style="'+divStyle+'"><img src="' + img_url_wsrv +
                                  '"onerror="this.onerror=null; this.src=' + "'" + img_url + "'" +
                                  '"class="round_icon" style="display:inline-block">' + key + '</div>';
 
@@ -14442,6 +14448,13 @@ function auto_feed() {
         console.log(labels)
         try {
             switch (forward_site){
+                case 'PTLGS':
+                    if (labels.gy){ check_label(document.getElementsByName('tags[4][]'), '5'); }
+                    if (labels.zz){ check_label(document.getElementsByName('tags[4][]'), '6'); }
+                    if (labels.diy){ check_label(document.getElementsByName('tags[4][]'), '4'); }
+                    if (labels.hdr10 || labels.hdr10plus) { check_label(document.getElementsByName('tags[4][]'), '7');}
+                    if (labels.db) {check_label(document.getElementsByName('tags[4][]'), '8');}
+                    break;
                 case 'PTer':
                     if (labels.gy){ document.getElementById('guoyu').checked=true; }
                     if (labels.yy){ document.getElementById('yueyu').checked=true; }
@@ -16416,7 +16429,77 @@ function auto_feed() {
                 standard_box.options[index].selected = true;
             }
         }
+        else if (forward_site == 'PTLGS'){
+            var browsecat = $('#browsecat');
+            var type_dict = {'音乐': 409,  '体育': 407,'MV': 406,'综艺': 403,'剧集': 402,'电视剧': 402, '动漫': 405,'纪录': 404,'纪录片': 404, '电影': 401, };
+            browsecat.val(0);
+            if (type_dict.hasOwnProperty(raw_info.type)){
+                var index = type_dict[raw_info.type];
+                browsecat.val(index);
+            }
 
+            document.getElementById('browsecat').dispatchEvent(evt);
+            var medium_box = $('select[name^="medium_sel"]');
+            medium_box.val(12);
+            switch(raw_info.medium_sel){
+                case 'UHD':
+                    medium_box.val(9);
+                    break;
+                case 'Blu-ray':
+                    medium_box.val(8);
+                    break;
+                case 'DVD': medium_box.val(1); break;
+                case 'Remux': medium_box.val(6); break;
+                case 'HDTV': medium_box.val(3); break;
+                case 'Encode': medium_box.val(5); break;
+                case 'WEB-DL': medium_box.val(4); break;
+                case 'CD': medium_box.val(11);
+            }
+
+            //视频编码
+            var codec_box = $('select[name^="codec_sel"]');
+            codec_box.val(5);
+            switch (raw_info.codec_sel){
+                case 'H265': case 'X265': codec_box.val(6); break;
+                case 'H264': case 'X264': codec_box.val(7); break;
+                case 'VC-1': codec_box.val(2); break;
+                case 'MPEG-2': case 'MPEG-4': codec_box.val(4);
+            }
+
+            //音频编码
+            var audiocodec_box = $('select[name^="audiocodec_sel"]');
+            audiocodec_box.val(7);
+            console.log(raw_info.audiocodec_sel)
+            switch (raw_info.audiocodec_sel){
+                case 'DTS-HD': case 'DTS-HDMA': case 'DTS-HDHR':
+                    audiocodec_box.val(3);
+                    break;
+                case 'TrueHD': audiocodec_box.val(9); break;
+                case 'Atmos': audiocodec_box.val(16); break;
+                case 'LPCM': audiocodec_box.val(11); break;
+                case 'DTS': audiocodec_box.val(3); break;
+                case 'AC3': audiocodec_box.val(13); break;
+                case 'AAC': audiocodec_box.val(6); break;
+                case 'Flac': audiocodec_box.val(1); break;
+                case 'APE': audiocodec_box.val(2); break;
+                case 'WAV': audiocodec_box.val(17); break;
+                case 'MP3': audiocodec_box.val(4); break;
+                case 'M4A': audiocodec_box.val(18);
+            }
+
+            $('select[name^="team_sel"]').val("13");
+            check_team(raw_info, 'team_sel');
+
+            //分辨率
+            var standard_box = $('select[name^="standard_sel"]');
+            var standard_dict = {
+                '8K': 6, '4K': 5, '1080p': 1, '1080i': 2, '720p': 3, 'SD': 4, '': 7
+            };
+            if (standard_dict.hasOwnProperty(raw_info.standard_sel)){
+                standard_box.val(standard_dict[raw_info.standard_sel]);
+            }
+
+        }
         else if (forward_site == 'HDHome'){
             //类型
             var is_pad = false;
@@ -27584,3 +27667,20 @@ if (origin_site == 'ZHUQUE' && site_url.match(/^https:\/\/zhuque.in\/torrent\/in
 } else {
     setTimeout(auto_feed, sleep_time);
 }
+
+
+(function (){
+    var style = document.createElement('style');
+    var css = `  
+                @keyframes ptlgs_rainbow_animation {  
+                    0%, 100% {  
+                        background-position: 0 0;  
+                    }  
+                    50% {  
+                        background-position: 100% 0;  
+                    }  
+                }    
+            `;
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+})();
