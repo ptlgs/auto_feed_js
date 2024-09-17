@@ -14235,7 +14235,7 @@ function auto_feed() {
         }
 
         //填写简介，一般都是textarea，特殊情况后续处理--CMCT改版兼容
-        var descr_box = document.getElementsByTagName('textarea');
+        var descr_box = [document.querySelector('textarea#descr')];
         if (forward_site == 'HDAtmos') {
             raw_info.descr.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/g).forEach((item)=>{
                 var index = raw_info.descr.indexOf(item);
