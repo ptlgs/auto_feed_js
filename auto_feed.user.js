@@ -3947,7 +3947,11 @@ function fill_torrent(forward_site, container, name) {
         });
     }
     else {
+        if($('input[name=file]').length){
         $('input[name=file]')[0].files = container.files;
+        }else{
+            // do thing - 可能是发布到候选
+        }
         if (forward_site == 'HHClub') {
             $('#torrentName').text(name);
         }
