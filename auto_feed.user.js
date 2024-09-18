@@ -16437,7 +16437,7 @@ function auto_feed() {
                 var index = type_dict[raw_info.type];
                 browsecat.val(index);
             }
-
+            get_full_size_picture_urls(null, infos.pic_info, $('#textarea-screenshots'), false);
             document.getElementById('browsecat').dispatchEvent(evt);
             var medium_box = $('select[name^="medium_sel"]');
             medium_box.val(12);
