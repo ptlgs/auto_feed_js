@@ -2883,11 +2883,16 @@ String.prototype.source_sel = function() {
 String.prototype.get_label = function(){
     var my_string = this.toString();
     var name = my_string.split('#separator#')[0];
-    var labels = {'gy': false, 'yy': false, 'zz': false, 'diy': false, 'hdr10': false, 'db': false, 'hdr10plus': false, 'yz': false, 'web':false};
-
+    var labels = {'gy': false, 'yy': false, 'zz': false, 'diy': false, 'hdr10': false, 'db': false, 'hdr10plus': false, 'yz': false, 'web':false, 'remux': false};
     if (my_string.toLowerCase().match(/(webdl|web-dl)/)) {
         labels.web = true;
     }
+
+
+    if (my_string.toLowerCase().match(/remux/)) {
+        labels.remux = true;
+    }
+
     if (my_string.match(/([简繁].{0,12}字幕|[简繁中].{0,3}字|简中|DIY.{1,5}字|内封.{0,3}[繁中字])|(Text.*?[\s\S]*?Chinese|Text.*?[\s\S]*?Mandarin|subtitles.*chs|subtitles.*mandarin|subtitle.*chinese|Presentation Graphics.*?Chinese)/i)){
         labels.zz = true;
     }
@@ -14847,6 +14852,8 @@ function auto_feed() {
                     if (labels.hdr10 || labels.hdr10plus) { check_label(document.getElementsByName('tags[4][]'), '7');}
                     if (labels.db) {check_label(document.getElementsByName('tags[4][]'), '8');}
                     if (labels.web) {check_label(document.getElementsByName('tags[4][]'), '14');}
+		    if (labels.remux) {check_label(document.getElementsByName('tags[4][]'), '11');}
+ 
                     break;
                 case 'PTer':
                     if (labels.gy){ document.getElementById('guoyu').checked=true; }
