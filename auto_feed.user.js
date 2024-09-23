@@ -8201,6 +8201,16 @@ function auto_feed() {
                 if (origin_site == 'HaresClub') {
                     descr = $('#kdescr').next()[0];
                 }
+
+                // For the 'PTLGS' site, the description (descr) is optional
+                // This code creates a DOM shim to ensure compatibility with the rest of the system
+                if (!descr && origin_site == 'PTLGS') {
+                    shim = document.createElement('tr');
+                    shim.innerHTML='<td>其它信息</td><td><div id="kdescr"></div></td>'
+                    shim.style.display = 'none';
+                    $('#torrent-info-root>tbody')[0].appendChild(shim);
+                    descr = document.getElementById("kdescr");
+                }
             }
             if (origin_site == 'QingWa') {
                 if($('#kimdb').length) {
@@ -10106,6 +10116,10 @@ function auto_feed() {
             tbody = d_table;
             raw_info.name = $('h2').find('span:first').text();
             raw_info.torrent_url = site_url;
+        }
+
+        if (origin_site === 'PTLGS') {
+            tbody = $('#torrent-info-root>tbody')[0];
         }
 
         //-------------------------------------根据table获取其他信息——包含插入节点（混合）-------------------------------------------
