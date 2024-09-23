@@ -95,7 +95,7 @@
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1268106
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      2.0.7.6
+// @version      2.0.7.7
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -735,6 +735,375 @@ if (site_url.match(/^https:\/\/hdf\.world\/.*/)) {
     menu_html = menu_html.replace(/Envoyé/g, 'Uploaded');
     menu_html = menu_html.replace(/Reçu/g, 'Downloaded');
     $('#header').html(menu_html);
+}
+
+// 用于处理 PTLGS 在页面没有 #kdescr时的异常
+/*
+
+*/
+//下面几个函数为字符串赋予获取各种编码信息的方法——适用于页面基本信息和字符串
+String.prototype.medium_sel = function() { //媒介
+    var result = this.toString();
+    if (result.match(/(Webdl|Web-dl|WEB[\. ])/i) && !raw_info.name.match(/webrip/i)) {
+        result = 'WEB-DL';
+    } else if (result.match(/(UHDTV)/i)) {
+        result = 'UHDTV';
+    } else if (result.match(/(HDTV)/i)) {
+        result = 'HDTV';
+    } else if (result.match(/(Remux)/i) && ! result.match(/Encode/)) {
+        result = 'Remux';
+    } else if (result.match(/(Blu-ray|.MPLS|Bluray原盘)/i) && !result.match(/Encode/i)) {
+        result = 'Blu-ray';
+    } else if (result.match(/(UHD|UltraHD)/i) && !result.match(/Encode/i)) {
+        result = 'UHD';
+    } else if (result.match(/(Encode|BDRIP|webrip|BluRay)/i) || result.match(/(x|H).?(264|265)/i)) {
+        result = 'Encode';
+    } else if (result.match(/(DVDRip|DVD)/i)) {
+        result = 'DVD';
+    } else if (result.match(/TV/)) {
+        result = 'TV';
+    } else if (result.match(/VHS/)) {
+        result = 'VHS';
+    } else if (result.match(/格式: CD|媒介: CD/)) {
+        result = 'CD';
+    } else {
+        result = '';
+    }
+    return result;
+};
+
+String.prototype.codec_sel = function() { //编码
+
+    var result = this;
+    if (result.match(/(H264|H\.264|AVC)/i)) {
+        result = 'H264';
+    } else if (result.match(/(HEVC|H265|H\.265)/i)) {
+        result = 'H265';
+    } else if (result.match(/(VVC|H266|H\.266)/i)) {
+        result = 'H266';
+    } else if (result.match(/(X265)/i)) {
+        result = 'X265';
+    } else if (result.match(/(X264)/i)) {
+        result = 'X264';
+    } else if (result.match(/(VC-1)/i)) {
+        result = 'VC-1';
+    } else if (result.match(/(MPEG-2)/i)) {
+        result = 'MPEG-2';
+    } else if (result.match(/(MPEG-4)/i)) {
+        result = 'MPEG-4';
+    } else if (result.match(/(XVID)/i)) {
+        result = 'XVID';
+    } else if (result.match(/(VP9)/i)) {
+        result = 'VP9';
+    } else if (result.match(/DIVX/i)) {
+        result = 'DIVX';
+    } else {
+        result = '';
+    }
+
+    return result;
+};
+
+String.prototype.audiocodec_sel = function() { //音频编码
+    var result = this.toString();
+    if (result.match(/(DTS-HDMA:X 7\.1|DTS.?X.?7\.1)/i)){
+        result = 'DTS-HDMA:X 7.1';
+    } else if (result.match(/(DTS-HD.?MA)/i)) {
+        result = 'DTS-HDMA';
+    } else if (result.match(/(DTS-HD.?HR)/i)) {
+        result = 'DTS-HDHR';
+    } else if (result.match(/(DTS-HD)/i)) {
+        result = 'DTS-HD';
+    } else if (result.match(/(DTS.?X)/i)) {
+        result = 'DTS-X';
+    } else if (result.match(/(LPCM)/i)) {
+        result = 'LPCM';
+    } else if (result.match(/([ \.]DD|AC3|AC-3|Dolby Digital)/i)) {
+        result = 'AC3';
+    } else if (result.match(/(Atmos)/i) && result.match(/True.?HD/)) {
+        result = 'Atmos';
+    } else if (result.match(/(AAC)/i)) {
+        result = 'AAC';
+    } else if (result.match(/(TrueHD)/i)) {
+        result = 'TrueHD';
+    } else if (result.match(/(DTS)/i)) {
+        result = 'DTS';
+    } else if (result.match(/(Flac)/i)) {
+        result = 'Flac';
+    } else if (result.match(/(APE)/i)) {
+        result = 'APE';
+    } else if (result.match(/(MP3)/i)) {
+        result = 'MP3';
+    } else if (result.match(/(WAV)/i)) {
+        result = 'WAV';
+    } else if (result.match(/(OPUS)/i)) {
+        result = 'OPUS';
+    } else if (result.match(/(OGG)/i)) {
+        result = 'OGG';
+    } else {
+        result = '';
+    }
+    if (this.toString().match(/AUDiO CODEC/i) && this.toString().match(/-WiKi/)) {
+        result = this.match(/AUDiO CODEC.*/i)[0];
+        result = result.audiocodec_sel();
+    }
+    return result;
+};
+
+String.prototype.standard_sel = function() {
+
+    var result = this;
+    if (result.match(/(4320p|8k)/i)){
+        result = '8K';
+    } else if (result.match(/(1080p|2K)/i)){
+        result = '1080p';
+    } else if (result.match(/(720p)/i)){
+        result = '720p';
+    } else if (result.match(/(1080i)/i)){
+        result = '1080i';
+    } else if (result.match(/(576[pi]|480[pi])/i)){
+        result = 'SD';
+    } else if (result.match(/(1440p)/i)){
+        result = '144Op';
+    } else if (result.match(/(2160p|4k)/i)){
+        result = '4K';
+    } else {
+        result = '';
+    }
+    return result;
+};
+
+//获取类型
+String.prototype.get_type = function() {
+    var result = this.toString();
+    if (result.match(/(Movie|电影|UHD原盘|films|電影|剧场)/i)) {
+        result = '电影';
+    } else if (result.match(/(Animation|动漫|動畫|动画|Anime|Cartoons)/i)) {
+        result = '动漫';
+    } else if (result.match(/(TV.*Show|综艺)/i)) {
+        result = '综艺';
+    } else if (result.match(/(Docu|纪录|Documentary)/i)) {
+        result = '纪录';
+    } else if (result.match(/(TV.*Series|剧|TV-PACK|TV-Episode|TV)/i)) {
+        result = '剧集';
+    } else if (result.match(/(Music Videos|音乐短片|MV\(演唱\)|MV.演唱会|MV\(音乐视频\)|Music Video|Musics MV|Music-Video|音乐视频|演唱会\/MV|MV\/演唱会)/i)) {
+        result = 'MV';
+    } else if (result.match(/(Music|音乐)/i)) {
+        result = '音乐';
+    } else if (result.match(/(Sport|体育)/i)) {
+        result = '体育';
+    } else if (result.match(/(学习|资料|Study)/i)) {
+        result = '学习';
+    } else if (result.match(/(Software|软件)/i)) {
+        result = '软件';
+    } else if (result.match(/(Game|游戏)/i)) {
+        result = '游戏';
+    } else if (result.match(/(eBook|電子書|电子书|有声书|书籍|book)/i)) {
+        result = '书籍';
+    } else {
+        result = '';
+    }
+    return result;
+};
+
+String.prototype.source_sel = function() {
+    var info_text = this;
+    //来源就在这里获取
+    if (info_text.match(/(HK&TW|港台|thai)/i)) {
+        source_sel = '港台';
+    } else if (info_text.match(/(EU&US|欧美|US\/EU|英美)/i)) {
+        source_sel = '欧美';
+    } else if (info_text.match(/(JP&KR|日韩|japanese|korean)/i)) {
+        source_sel = '日韩';
+    } else if (info_text.match(/(香港)/i)) {
+        source_sel = '香港';
+    } else if (info_text.match(/(台湾)/i)) {
+        source_sel = '台湾';
+    } else if (info_text.match(/(大陆|China|中国|CN|chinese)/i)) {
+        source_sel = '大陆';
+    } else if (info_text.match(/(日本|JP)/i)) {
+        source_sel = '日本';
+    } else if (info_text.match(/(韩国|KR)/i)) {
+        source_sel = '韩国';
+    } else if (info_text.match(/(印度)/i)) {
+        source_sel = '印度';
+    } else {
+        source_sel = '';
+    }
+    return source_sel;
+};
+
+if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i) && document.querySelector('#kdescr') === null){
+    console.log("hook...")
+    ptlgs = {
+        "name": "",
+        "small_descr": "",
+        "url": "",
+        "dburl": "",
+        "descr": "",
+        "log_info": "",
+        "tracklist": "",
+        "music_type": "",
+        "music_media": "",
+        "edition_info": "",
+        "music_name": "",
+        "music_author": "",
+        "animate_info": "",
+        "anidb": "",
+        "torrentName": "",
+        "images": [],
+        "torrent_name": "",
+        "torrent_url": "",
+        "type": "",
+        "source_sel": "",
+        "standard_sel": "",
+        "audiocodec_sel": "",
+        "codec_sel": "",
+        "medium_sel": "",
+        "origin_site": "PTLGS",
+        "origin_url": location.href,
+        "golden_torrent": false,
+        "mediainfo_cmct": "",
+        "imgs_cmct": "",
+        "full_mediainfo": "",
+        "subtitles": [],
+        "youtube_url": "",
+        "ptp_poster": "",
+        "comparisons": "",
+        "version_info": "",
+        "multi_mediainfo": "",
+        "labels": 0
+    }
+    var tr = `<tr><td class="rowhead nowrap" valign="top" align="right">简介</td><td class="rowfollow" valign="top" align="left"><div id="kdescr"></div></td></tr>`
+    $('#outer>table:eq(2)>tbody').first().append(tr)
+    console.log(707, tr)
+    var output = $('#kdescr').first()
+    var temp
+    // 引用
+    if ($('#top>span:first').first().text() !== null && $('#top>span:first').first().text().split('-') !== null && $('#top>span:first').first().text().split('-').length > 0) {
+        var groupName = $('#top>span:first').first().text().split('-').pop()
+        temp = '<fieldset><legend>引用</legend><br><b><span style="color: blue;">' + groupName + '组作品，感谢原制作者发布。<span></b></fieldset>'
+    }
+    output.html(output.html() + temp)
+    ptlgs.name = $('#top>span:first').first().text()
+    ptlgs.small_descr = $('#torrent-info-root>tbody:first>tr:eq(1)>td:eq(1)').first().text()
+    ptlgs.torrent_name = $('#torrent-info-root>tbody:first>tr:eq(0)>td:eq(1)>a:first').first().text()
+    ptlgs.torrent_url = location.origin + '/' + $('#torrent-info-root>tbody:first>tr:eq(0)>td:eq(1)>a:first').first().attr("href")
+    ptlgs.full_mediainfo = $('.nexus-media-info-raw:first>div:first>div:eq(1)>pre')[0].innerText
+    ptlgs.descr = `[quote][b][color=blue]${groupName}官组作品，感谢原制作者发布。[/color][/b][/quote]\n\n`
+    console.log(ptlgs)
+    // 海报
+    temp = $('#ktorrentcover').first().html()
+    output.html(output.html() + '<br><br>' + temp)
+    var picList = $('#ktorrentcover')[0].querySelectorAll('img')
+    var tempList = []
+    Array.from(picList).forEach(img => {
+        if (!img.src.endsWith('gif'))
+            tempList.push(img.src)
+    })
+    if (tempList === null || tempList.length === 0) alert("未找到海报！")
+    else {
+        ptlgs.descr += `[img]${tempList.pop()}[/img]`
+    }
+    // console.log(ptlgs)
+    // 豆瓣
+    var doubanInfo= {}
+    var name = $('.douban-info:first>div:first h2:first').first().text()
+    var link = $('.douban-info:first>div:first h2:first>a:first').first().attr("href")
+    ptlgs.dburl = link
+    var nickname = $('.douban-info:first>div:first h3:first').first().text().replace("别名：", "")
+    console.log(link)
+    console.log(name)
+    console.log(nickname)
+    doubanInfo.name = name
+    doubanInfo.nickname = nickname
+    doubanInfo.dblink = link
+    Array.from($('.douban-info:first>div:eq(1)').first().find('p')).forEach(item => {
+        console.log(724, item.querySelector("strong").innerText)
+        switch (item.querySelector("strong").innerText){
+            case ('年代：'):
+                doubanInfo.year = item.querySelector("span").innerText
+                break
+            case ('国家：'):
+                doubanInfo.area = item.querySelector("span").innerText
+                break
+            case ('类别：'):
+                doubanInfo.type = item.querySelector("span").innerText
+                break
+            case ('对白语言：'):
+                doubanInfo.language = item.querySelector("span").innerText
+                break
+            case ('评分：'):
+                doubanInfo.grade = item.querySelector("span").innerText
+                break
+            case ('片长：'):
+                doubanInfo.duration = item.querySelector("span").innerText
+                break
+            case ('导演：'):
+                doubanInfo.directors = item.querySelector("span").innerText
+                break
+            case ('编剧：'):
+                doubanInfo.writers = item.querySelector("span").innerText
+                break
+        }
+    })
+    doubanInfo.actors = []
+    Array.from($('.douban-info:first>div:eq(3)').first().find('li')).forEach(item => {
+        doubanInfo.actors.push(item.innerText)
+    })
+    console.log(731, doubanInfo)
+    var paramsList = ['◎译　　名　', '◎片　　名　', '◎年　　代　', '◎产　　地　', '◎类　　别　', '◎语　　言　', '◎豆瓣评分　', '◎豆瓣链接　' , '◎片　　长　', '◎导　　演　', '◎编　　剧　', '◎主　　演　']
+    var keysList = ['name', 'nickname', 'year', 'area', 'type', 'language', 'grade', 'dblink', 'duration', 'directors', 'writers', 'actors']
+    var hasKeyList = Array.from(Object.keys(doubanInfo))
+    var index
+    temp = ''
+    keysList.forEach((key) => {
+        index = hasKeyList.indexOf(key);
+        if (index >= 0) {
+            keysList.indexOf(key)
+            if (key === 'dblink') {
+                temp += paramsList[index] + `<a href=${doubanInfo[key]} target="_blank" syule="color: #a83838;">` + doubanInfo[key] + '</a><br>'
+            } else if (key === 'actors') {
+                temp += paramsList[index]
+                doubanInfo.actors.forEach(actor => {
+                    temp += actor + '<br>　　　　　&nbsp;&nbsp;'
+                })
+            } else {
+                console.log(780, key, paramsList[keysList.indexOf(key)])
+                temp += paramsList[keysList.indexOf(key)] + doubanInfo[key] + '<br>'
+            }
+        }
+    })
+    temp += '<br><br>◎简　　介　<br>　　' + $('.douban-info:first>div:eq(2)>p:first').first().text()
+    console.log($('.douban-info:first>div:eq(2)>p:first').first().text())
+    ptlgs.descr += temp.replaceAll("<br>", "\n").replaceAll("&nbsp;", "　") + '\n'
+    ptlgs.descr += `[quote]\n${ptlgs.full_mediainfo}[/quote]\n`
+    output.html(output.html() + '<br><br>' + temp)
+    output.html(output.html() + '<br><br><div>' + $('#ktorrentscreenshots')[0].innerHTML + '</div>')
+    var picList = $('#ktorrentscreenshots')[0].querySelectorAll('img')
+    var tempList = []
+    Array.from(picList).forEach(img => {
+        if (!img.src.endsWith('gif'))
+            tempList.push(`[img]${img.src}[/img]`)
+    })
+    if (tempList === null || tempList.length === 0) alert("未找到截图！")
+    tempList.forEach(img => {
+        ptlgs.descr += img + '\n'
+    })
+    if ($('#torrent-info-root>tbody:first>tr:eq(2)>td:eq(1)>span:contains(国语)').length) ptlgs.labels += 1
+    if ($('#torrent-info-root>tbody:first>tr:eq(2)>td:eq(1)>span:contains(中字)').length) ptlgs.labels += 100
+        ,
+        ptlgs.type = ptlgs.descr.get_type()
+    ptlgs.standard_sel = ptlgs.descr.standard_sel()
+    ptlgs.source_sel = ptlgs.descr.source_sel()
+    ptlgs.codec_sel = ptlgs.descr.codec_sel()
+    ptlgs.audiocodec_sel = ptlgs.descr.audiocodec_sel()
+    ptlgs.medium_sel = ptlgs.descr.medium_sel()
+
+
+
+    window.ptlgs = ptlgs
+    console.log(window.ptlgs)
 }
 
 //用于修改hdf的显示样式，不喜欢可以删除或者注释掉
@@ -3426,7 +3795,7 @@ function match_link(site, data) {
 }
 
 function set_jump_href(raw_info, mode) {
-
+    if (location.origin === 'https://ptlgs.org') raw_info = window.ptlgs
     if (mode == 1) {
         for (key in used_site_info) {
             if (used_site_info[key].enable) {
