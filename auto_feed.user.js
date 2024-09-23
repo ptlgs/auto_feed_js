@@ -5,8 +5,10 @@
 // @contributor  daoshuailx/hollips/kmeng/wyyqyl/shmt86/sauterne
 // @description  PT一键转种脚本
 // @match        https://blutopia.cc/torrents?imdb=tt*
-// @namespace    https://greasyfork.org/zh-CN/scripts/424132-auto-feed
-// @updateURL    https://greasyfork.org/zh-CN/scripts/424132-auto-feed
+// @namespace    https://userscripts.ptl.gs/auto_feed.user.js
+// @updateURL    https://userscripts.ptl.gs/auto_feed.user.js
+// @downloadURL  https://userscripts.ptl.gs/auto_feed.user.js
+// @homepage     https://ptlgs.org/
 // @match        http*://*/*detail*.php*
 // @match        https://nzbs.in/*
 // @match        http*://*/detail*.php*
@@ -93,7 +95,7 @@
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1268106
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      2.0.7.3
+// @version      2.0.7.6
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
