@@ -989,7 +989,8 @@ if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i) && document.querySele
     ptlgs.small_descr = $('#torrent-info-root>tbody:first>tr:eq(1)>td:eq(1)').first().text()
     ptlgs.torrent_name = $('#torrent-info-root>tbody:first>tr:eq(0)>td:eq(1)>a:first').first().text()
     ptlgs.torrent_url = location.origin + '/' + $('#torrent-info-root>tbody:first>tr:eq(0)>td:eq(1)>a:first').first().attr("href")
-    ptlgs.full_mediainfo = $('.nexus-media-info-raw:first>div:first>div:eq(1)>pre')[0].innerText
+    var full_mediainfo_box = $('.nexus-media-info-raw:first>div:first>div:eq(1)>pre')
+    ptlgs.full_mediainfo = full_mediainfo_box.length > 0 ? full_mediainfo_box[0].innerText : $('.nexus-media-info-raw:first>pre')[0].innerText
     ptlgs.descr = `[quote][b][color=blue]${groupName}官组作品，感谢原制作者发布。[/color][/b][/quote]\n\n`
     console.log(ptlgs)
     // 海报
