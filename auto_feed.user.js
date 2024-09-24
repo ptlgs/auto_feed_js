@@ -933,8 +933,12 @@ String.prototype.source_sel = function() {
     return source_sel;
 };
 
-if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i) && document.querySelector('#kdescr') === null){
+if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i)){
     console.log("hook...")
+    if (jQuery('b[title="类型"]').next().text() === '音乐') alert('暂不支持音乐种，后续会逐渐适配...')
+    if (document.querySelector('#kdescr') !== null) {
+        document.querySelector('#kdescr').id = 'kother'
+    }
     ptlgs = {
         "name": "",
         "small_descr": "",
