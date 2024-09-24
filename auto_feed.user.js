@@ -1065,10 +1065,12 @@ if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i) && document.querySele
             if (key === 'dblink') {
                 temp += paramsList[index] + `<a href=${doubanInfo[key]} target="_blank" syule="color: #a83838;">` + doubanInfo[key] + '</a><br>'
             } else if (key === 'actors') {
-                temp += paramsList[index]
-                doubanInfo.actors.forEach(actor => {
-                    temp += actor + '<br>　　　　　&nbsp;&nbsp;'
-                })
+                if (doubanInfo.actors.length) {
+                    temp += paramsList[index]
+                    doubanInfo.actors.forEach(actor => {
+                        temp += actor + '<br>　　　　　&nbsp;&nbsp;'
+                    })
+                }
             } else {
                 console.log(780, key, paramsList[keysList.indexOf(key)])
                 temp += paramsList[keysList.indexOf(key)] + doubanInfo[key] + '<br>'
