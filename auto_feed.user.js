@@ -741,200 +741,201 @@ if (site_url.match(/^https:\/\/hdf\.world\/.*/)) {
 /*
 
 */
-//下面几个函数为字符串赋予获取各种编码信息的方法——适用于页面基本信息和字符串
-String.prototype.medium_sel = function() { //媒介
-    var result = this.toString();
-    if (result.match(/(Webdl|Web-dl|WEB[\. ])/i) && !raw_info.name.match(/webrip/i)) {
-        result = 'WEB-DL';
-    } else if (result.match(/(UHDTV)/i)) {
-        result = 'UHDTV';
-    } else if (result.match(/(HDTV)/i)) {
-        result = 'HDTV';
-    } else if (result.match(/(Remux)/i) && ! result.match(/Encode/)) {
-        result = 'Remux';
-    } else if (result.match(/(Blu-ray|.MPLS|Bluray原盘)/i) && !result.match(/Encode/i)) {
-        result = 'Blu-ray';
-    } else if (result.match(/(UHD|UltraHD)/i) && !result.match(/Encode/i)) {
-        result = 'UHD';
-    } else if (result.match(/(Encode|BDRIP|webrip|BluRay)/i) || result.match(/(x|H).?(264|265)/i)) {
-        result = 'Encode';
-    } else if (result.match(/(DVDRip|DVD)/i)) {
-        result = 'DVD';
-    } else if (result.match(/TV/)) {
-        result = 'TV';
-    } else if (result.match(/VHS/)) {
-        result = 'VHS';
-    } else if (result.match(/格式: CD|媒介: CD/)) {
-        result = 'CD';
-    } else {
-        result = '';
-    }
-    return result;
-};
-
-String.prototype.codec_sel = function() { //编码
-
-    var result = this;
-    if (result.match(/(H264|H\.264|AVC)/i)) {
-        result = 'H264';
-    } else if (result.match(/(HEVC|H265|H\.265)/i)) {
-        result = 'H265';
-    } else if (result.match(/(VVC|H266|H\.266)/i)) {
-        result = 'H266';
-    } else if (result.match(/(X265)/i)) {
-        result = 'X265';
-    } else if (result.match(/(X264)/i)) {
-        result = 'X264';
-    } else if (result.match(/(VC-1)/i)) {
-        result = 'VC-1';
-    } else if (result.match(/(MPEG-2)/i)) {
-        result = 'MPEG-2';
-    } else if (result.match(/(MPEG-4)/i)) {
-        result = 'MPEG-4';
-    } else if (result.match(/(XVID)/i)) {
-        result = 'XVID';
-    } else if (result.match(/(VP9)/i)) {
-        result = 'VP9';
-    } else if (result.match(/DIVX/i)) {
-        result = 'DIVX';
-    } else {
-        result = '';
-    }
-
-    return result;
-};
-
-String.prototype.audiocodec_sel = function() { //音频编码
-    var result = this.toString();
-    if (result.match(/(DTS-HDMA:X 7\.1|DTS.?X.?7\.1)/i)){
-        result = 'DTS-HDMA:X 7.1';
-    } else if (result.match(/(DTS-HD.?MA)/i)) {
-        result = 'DTS-HDMA';
-    } else if (result.match(/(DTS-HD.?HR)/i)) {
-        result = 'DTS-HDHR';
-    } else if (result.match(/(DTS-HD)/i)) {
-        result = 'DTS-HD';
-    } else if (result.match(/(DTS.?X)/i)) {
-        result = 'DTS-X';
-    } else if (result.match(/(LPCM)/i)) {
-        result = 'LPCM';
-    } else if (result.match(/([ \.]DD|AC3|AC-3|Dolby Digital)/i)) {
-        result = 'AC3';
-    } else if (result.match(/(Atmos)/i) && result.match(/True.?HD/)) {
-        result = 'Atmos';
-    } else if (result.match(/(AAC)/i)) {
-        result = 'AAC';
-    } else if (result.match(/(TrueHD)/i)) {
-        result = 'TrueHD';
-    } else if (result.match(/(DTS)/i)) {
-        result = 'DTS';
-    } else if (result.match(/(Flac)/i)) {
-        result = 'Flac';
-    } else if (result.match(/(APE)/i)) {
-        result = 'APE';
-    } else if (result.match(/(MP3)/i)) {
-        result = 'MP3';
-    } else if (result.match(/(WAV)/i)) {
-        result = 'WAV';
-    } else if (result.match(/(OPUS)/i)) {
-        result = 'OPUS';
-    } else if (result.match(/(OGG)/i)) {
-        result = 'OGG';
-    } else {
-        result = '';
-    }
-    if (this.toString().match(/AUDiO CODEC/i) && this.toString().match(/-WiKi/)) {
-        result = this.match(/AUDiO CODEC.*/i)[0];
-        result = result.audiocodec_sel();
-    }
-    return result;
-};
-
-String.prototype.standard_sel = function() {
-
-    var result = this;
-    if (result.match(/(4320p|8k)/i)){
-        result = '8K';
-    } else if (result.match(/(1080p|2K)/i)){
-        result = '1080p';
-    } else if (result.match(/(720p)/i)){
-        result = '720p';
-    } else if (result.match(/(1080i)/i)){
-        result = '1080i';
-    } else if (result.match(/(576[pi]|480[pi])/i)){
-        result = 'SD';
-    } else if (result.match(/(1440p)/i)){
-        result = '144Op';
-    } else if (result.match(/(2160p|4k)/i)){
-        result = '4K';
-    } else {
-        result = '';
-    }
-    return result;
-};
-
-//获取类型
-String.prototype.get_type = function() {
-    var result = this.toString();
-    if (result.match(/(Movie|电影|UHD原盘|films|電影|剧场)/i)) {
-        result = '电影';
-    } else if (result.match(/(Animation|动漫|動畫|动画|Anime|Cartoons)/i)) {
-        result = '动漫';
-    } else if (result.match(/(TV.*Show|综艺)/i)) {
-        result = '综艺';
-    } else if (result.match(/(Docu|纪录|Documentary)/i)) {
-        result = '纪录';
-    } else if (result.match(/(TV.*Series|剧|TV-PACK|TV-Episode|TV)/i)) {
-        result = '剧集';
-    } else if (result.match(/(Music Videos|音乐短片|MV\(演唱\)|MV.演唱会|MV\(音乐视频\)|Music Video|Musics MV|Music-Video|音乐视频|演唱会\/MV|MV\/演唱会)/i)) {
-        result = 'MV';
-    } else if (result.match(/(Music|音乐)/i)) {
-        result = '音乐';
-    } else if (result.match(/(Sport|体育)/i)) {
-        result = '体育';
-    } else if (result.match(/(学习|资料|Study)/i)) {
-        result = '学习';
-    } else if (result.match(/(Software|软件)/i)) {
-        result = '软件';
-    } else if (result.match(/(Game|游戏)/i)) {
-        result = '游戏';
-    } else if (result.match(/(eBook|電子書|电子书|有声书|书籍|book)/i)) {
-        result = '书籍';
-    } else {
-        result = '';
-    }
-    return result;
-};
-
-String.prototype.source_sel = function() {
-    var info_text = this;
-    //来源就在这里获取
-    if (info_text.match(/(HK&TW|港台|thai)/i)) {
-        source_sel = '港台';
-    } else if (info_text.match(/(EU&US|欧美|US\/EU|英美)/i)) {
-        source_sel = '欧美';
-    } else if (info_text.match(/(JP&KR|日韩|japanese|korean)/i)) {
-        source_sel = '日韩';
-    } else if (info_text.match(/(香港)/i)) {
-        source_sel = '香港';
-    } else if (info_text.match(/(台湾)/i)) {
-        source_sel = '台湾';
-    } else if (info_text.match(/(大陆|China|中国|CN|chinese)/i)) {
-        source_sel = '大陆';
-    } else if (info_text.match(/(日本|JP)/i)) {
-        source_sel = '日本';
-    } else if (info_text.match(/(韩国|KR)/i)) {
-        source_sel = '韩国';
-    } else if (info_text.match(/(印度)/i)) {
-        source_sel = '印度';
-    } else {
-        source_sel = '';
-    }
-    return source_sel;
-};
-
 if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i)){
     console.log("hook...")
+
+    //下面几个函数为字符串赋予获取各种编码信息的方法——适用于页面基本信息和字符串
+    String.prototype.medium_sel = function(ptlgs) { //媒介
+        var result = this.toString();
+        if (result.match(/(Webdl|Web-dl|WEB[\. ])/i) && !ptlgs.name.match(/webrip/i)) {
+            result = 'WEB-DL';
+        } else if (result.match(/(UHDTV)/i)) {
+            result = 'UHDTV';
+        } else if (result.match(/(HDTV)/i)) {
+            result = 'HDTV';
+        } else if (result.match(/(Remux)/i) && ! result.match(/Encode/)) {
+            result = 'Remux';
+        } else if (result.match(/(Blu-ray|.MPLS|Bluray原盘)/i) && !result.match(/Encode/i)) {
+            result = 'Blu-ray';
+        } else if (result.match(/(UHD|UltraHD)/i) && !result.match(/Encode/i)) {
+            result = 'UHD';
+        } else if (result.match(/(Encode|BDRIP|webrip|BluRay)/i) || result.match(/(x|H).?(264|265)/i)) {
+            result = 'Encode';
+        } else if (result.match(/(DVDRip|DVD)/i)) {
+            result = 'DVD';
+        } else if (result.match(/TV/)) {
+            result = 'TV';
+        } else if (result.match(/VHS/)) {
+            result = 'VHS';
+        } else if (result.match(/格式: CD|媒介: CD/)) {
+            result = 'CD';
+        } else {
+            result = '';
+        }
+        return result;
+    };
+
+    String.prototype.codec_sel = function() { //编码
+
+        var result = this;
+        if (result.match(/(H264|H\.264|AVC)/i)) {
+            result = 'H264';
+        } else if (result.match(/(HEVC|H265|H\.265)/i)) {
+            result = 'H265';
+        } else if (result.match(/(VVC|H266|H\.266)/i)) {
+            result = 'H266';
+        } else if (result.match(/(X265)/i)) {
+            result = 'X265';
+        } else if (result.match(/(X264)/i)) {
+            result = 'X264';
+        } else if (result.match(/(VC-1)/i)) {
+            result = 'VC-1';
+        } else if (result.match(/(MPEG-2)/i)) {
+            result = 'MPEG-2';
+        } else if (result.match(/(MPEG-4)/i)) {
+            result = 'MPEG-4';
+        } else if (result.match(/(XVID)/i)) {
+            result = 'XVID';
+        } else if (result.match(/(VP9)/i)) {
+            result = 'VP9';
+        } else if (result.match(/DIVX/i)) {
+            result = 'DIVX';
+        } else {
+            result = '';
+        }
+
+        return result;
+    };
+
+    String.prototype.audiocodec_sel = function() { //音频编码
+        var result = this.toString();
+        if (result.match(/(DTS-HDMA:X 7\.1|DTS.?X.?7\.1)/i)){
+            result = 'DTS-HDMA:X 7.1';
+        } else if (result.match(/(DTS-HD.?MA)/i)) {
+            result = 'DTS-HDMA';
+        } else if (result.match(/(DTS-HD.?HR)/i)) {
+            result = 'DTS-HDHR';
+        } else if (result.match(/(DTS-HD)/i)) {
+            result = 'DTS-HD';
+        } else if (result.match(/(DTS.?X)/i)) {
+            result = 'DTS-X';
+        } else if (result.match(/(LPCM)/i)) {
+            result = 'LPCM';
+        } else if (result.match(/([ \.]DD|AC3|AC-3|Dolby Digital)/i)) {
+            result = 'AC3';
+        } else if (result.match(/(Atmos)/i) && result.match(/True.?HD/)) {
+            result = 'Atmos';
+        } else if (result.match(/(AAC)/i)) {
+            result = 'AAC';
+        } else if (result.match(/(TrueHD)/i)) {
+            result = 'TrueHD';
+        } else if (result.match(/(DTS)/i)) {
+            result = 'DTS';
+        } else if (result.match(/(Flac)/i)) {
+            result = 'Flac';
+        } else if (result.match(/(APE)/i)) {
+            result = 'APE';
+        } else if (result.match(/(MP3)/i)) {
+            result = 'MP3';
+        } else if (result.match(/(WAV)/i)) {
+            result = 'WAV';
+        } else if (result.match(/(OPUS)/i)) {
+            result = 'OPUS';
+        } else if (result.match(/(OGG)/i)) {
+            result = 'OGG';
+        } else {
+            result = '';
+        }
+        if (this.toString().match(/AUDiO CODEC/i) && this.toString().match(/-WiKi/)) {
+            result = this.match(/AUDiO CODEC.*/i)[0];
+            result = result.audiocodec_sel();
+        }
+        return result;
+    };
+
+    String.prototype.standard_sel = function() {
+
+        var result = this;
+        if (result.match(/(4320p|8k)/i)){
+            result = '8K';
+        } else if (result.match(/(1080p|2K)/i)){
+            result = '1080p';
+        } else if (result.match(/(720p)/i)){
+            result = '720p';
+        } else if (result.match(/(1080i)/i)){
+            result = '1080i';
+        } else if (result.match(/(576[pi]|480[pi])/i)){
+            result = 'SD';
+        } else if (result.match(/(1440p)/i)){
+            result = '144Op';
+        } else if (result.match(/(2160p|4k)/i)){
+            result = '4K';
+        } else {
+            result = '';
+        }
+        return result;
+    };
+
+    //获取类型
+    String.prototype.get_type = function() {
+        var result = this.toString();
+        if (result.match(/(Movie|电影|UHD原盘|films|電影|剧场)/i)) {
+            result = '电影';
+        } else if (result.match(/(Animation|动漫|動畫|动画|Anime|Cartoons)/i)) {
+            result = '动漫';
+        } else if (result.match(/(TV.*Show|综艺)/i)) {
+            result = '综艺';
+        } else if (result.match(/(Docu|纪录|Documentary)/i)) {
+            result = '纪录';
+        } else if (result.match(/(TV.*Series|剧|TV-PACK|TV-Episode|TV)/i)) {
+            result = '剧集';
+        } else if (result.match(/(Music Videos|音乐短片|MV\(演唱\)|MV.演唱会|MV\(音乐视频\)|Music Video|Musics MV|Music-Video|音乐视频|演唱会\/MV|MV\/演唱会)/i)) {
+            result = 'MV';
+        } else if (result.match(/(Music|音乐)/i)) {
+            result = '音乐';
+        } else if (result.match(/(Sport|体育)/i)) {
+            result = '体育';
+        } else if (result.match(/(学习|资料|Study)/i)) {
+            result = '学习';
+        } else if (result.match(/(Software|软件)/i)) {
+            result = '软件';
+        } else if (result.match(/(Game|游戏)/i)) {
+            result = '游戏';
+        } else if (result.match(/(eBook|電子書|电子书|有声书|书籍|book)/i)) {
+            result = '书籍';
+        } else {
+            result = '';
+        }
+        return result;
+    };
+
+    String.prototype.source_sel = function() {
+        var info_text = this;
+        //来源就在这里获取
+        if (info_text.match(/(HK&TW|港台|thai)/i)) {
+            source_sel = '港台';
+        } else if (info_text.match(/(EU&US|欧美|US\/EU|英美)/i)) {
+            source_sel = '欧美';
+        } else if (info_text.match(/(JP&KR|日韩|japanese|korean)/i)) {
+            source_sel = '日韩';
+        } else if (info_text.match(/(香港)/i)) {
+            source_sel = '香港';
+        } else if (info_text.match(/(台湾)/i)) {
+            source_sel = '台湾';
+        } else if (info_text.match(/(大陆|China|中国|CN|chinese)/i)) {
+            source_sel = '大陆';
+        } else if (info_text.match(/(日本|JP)/i)) {
+            source_sel = '日本';
+        } else if (info_text.match(/(韩国|KR)/i)) {
+            source_sel = '韩国';
+        } else if (info_text.match(/(印度)/i)) {
+            source_sel = '印度';
+        } else {
+            source_sel = '';
+        }
+        return source_sel;
+    };
+
     if (jQuery('b[title="类型"]').next().text() === '音乐') alert('暂不支持音乐种，后续会逐渐适配...')
     if (document.querySelector('#kdescr') !== null) {
         document.querySelector('#kdescr').id = 'kother'
@@ -1105,7 +1106,7 @@ if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i)){
     ptlgs.source_sel = ptlgs.descr.source_sel()
     ptlgs.codec_sel = ptlgs.descr.codec_sel()
     ptlgs.audiocodec_sel = ptlgs.descr.audiocodec_sel()
-    ptlgs.medium_sel = ptlgs.descr.medium_sel()
+    ptlgs.medium_sel = ptlgs.descr.medium_sel(ptlgs)
 
 
 
