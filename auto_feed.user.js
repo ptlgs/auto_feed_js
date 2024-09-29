@@ -979,7 +979,7 @@ if (site_url.match(/^https:\/\/ptlgs\.org\/details\.php/i)){
         "multi_mediainfo": "",
         "labels": 0
     }
-    var tr = `<tr><td class="rowhead nowrap" valign="top" align="right">简介</td><td class="rowfollow" valign="top" align="left"><div id="kdescr"></div></td></tr>`
+    var tr = `<tr><td class="rowhead nowrap" valign="top" align="right" style="display: none;">简介</td><td class="rowfollow" valign="top" align="left"><div id="kdescr"></div></td></tr>`
     $('#outer>table:eq(2)>tbody').first().append(tr)
     console.log(707, tr)
     var output = $('#kdescr').first()
