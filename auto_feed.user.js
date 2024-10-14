@@ -16850,9 +16850,9 @@ function auto_feed() {
             var medium_box = $('select[name^="medium_sel"]');
             medium_box.val(12);
             switch(raw_info.medium_sel){
-                case 'Blu-ray':case 'Encode':case 'UHD':medium_box.val(14);break;
+                case 'Blu-ray':case 'UHD':medium_box.val(14);break;
                 case 'Remux':medium_box.val(8); break;
-                case 'BDRip': medium_box.val(5); break;
+                case 'BDRip':case 'Encode':medium_box.val(5); break;
                 case 'WEB-DL': medium_box.val(4); break;
                 case 'WEBRiP': medium_box.val(7); break;
                 case 'HDTV': medium_box.val(3); break;
